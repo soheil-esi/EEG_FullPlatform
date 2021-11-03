@@ -22,7 +22,7 @@ namespace EEG.ProxySocket.WebHost1
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                    //.UseUrls("http://0.0.0.0:5000").UseKestrel()
+                    .UseUrls("http://0.0.0.0:5000").UseKestrel()
                     .UseStartup<Startup>();
                 });
     }
