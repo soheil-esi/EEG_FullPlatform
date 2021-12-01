@@ -48,31 +48,6 @@ namespace EEG.Dashboard.Presentation
             GetDataSource();
             StartConnection();
             _signalRConsumer.ReceiveFromProxySocket();
-            ObservableCollection<signalDto> initial = new ObservableCollection<signalDto>();
-            initial.Add(new signalDto()
-            {
-                timestamp = DateTime.Now.AddSeconds(-15),
-                value = 5
-            });
-            initial.Add(new signalDto()
-            {
-                timestamp = DateTime.Now.AddSeconds(-10),
-                value = 3
-
-            });
-            initial.Add(new signalDto()
-            {
-                timestamp = DateTime.Now.AddSeconds(-5),
-                value = 7
-
-            });
-            initial.Add(new signalDto()
-            {
-                timestamp = DateTime.Now,
-                value = 9
-
-            });
-            series.ItemsSource = initial;
             
         }
 
