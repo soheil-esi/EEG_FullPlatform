@@ -7,6 +7,7 @@ using EEG.Connector.Application.Common.Interface.Repositories;
 using EEG.Connector.Domain.Dtos;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -42,25 +43,35 @@ namespace EEG.Connector.Infrastructure.Handlers
                 int channelId = 1;
                 while (_isRunning)
                 {
-                    dataConverted = _converter.Convert(_cache.Get());
-                    if(dataConverted == null || dataConverted.Count() == 0)
+                    if(_cache.Count() > 0)
                     {
-                        continue;
-                    }
-
-                    dataConverted.ForEach(d =>
-                    {
-                        if (d.data.Count() > 0)
+                        Thread.Sleep(1000);
+                        dataConverted = _converter.Convert(_cache.Get(200));
+                        dataConverted.ForEach(d =>
                         {
-                            _kafkaRepository.Produce(d, _kafkaConfig.ProducersTopics[0], 0 , channelId).Wait();
-                            channelId++;
-                            if(channelId == 17)
+                            if (d.data.Count() > 0)
                             {
-                                channelId = 1;
+                                try
+                                {
+                                    _kafkaRepository.Produce(d, _kafkaConfig.AICoreTopics.Producer,
+                                        (int)((channelId - 1) / 4), channelId).Wait();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                }
+                                channelId++;
+                                if (channelId == 17)
+                                {
+                                    channelId = 1;
+                                }
                             }
+                        });
                         }
-                    });
-                    Thread.Sleep(5000);
+                    else
+                    {
+                        dataConverted = null;
+                    }
                 }
             });
         }
@@ -68,14 +79,16 @@ namespace EEG.Connector.Infrastructure.Handlers
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _isRunning = true;
-            _kafkaRepository.CreateTpoic(_kafkaConfig.ProducersTopics[0] , 1 , 1);
+            _kafkaRepository.CreateTpoic(_kafkaConfig.AICoreTopics.Producer, 1, 4);
+            _kafkaRepository.CreateTpoic(_kafkaConfig.AICoreTopics.Consumer, 1, 4);
             Inserter();
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _isRunning = false;
+            return Task.CompletedTask;
         }
     }
 }

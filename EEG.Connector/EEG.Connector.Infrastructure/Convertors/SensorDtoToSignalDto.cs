@@ -1,4 +1,5 @@
-﻿using EEG.Connector.Application.Common.Interface.Convertors;
+﻿using EEG.Connector.Application.Common.Interface;
+using EEG.Connector.Application.Common.Interface.Convertors;
 using EEG.Connector.Domain.Dtos;
 using System;
 using System.Collections.Generic;
@@ -11,19 +12,23 @@ namespace EEG.Connector.Infrastructure.Convertors
     public class SensorDtoToSignalDto : IConverter<signalDtos, sensorDto>
     {
         List<signalDtos> result;
+        DateTime _startTime;
+
         public SensorDtoToSignalDto()
         {
-            
+            _startTime = DateTime.Now;
         }
         public List<signalDtos> Convert(List<sensorDto> dataToBeConverted)
         {
             int countRepeat = 0;
             int channelId = 1;
+            _startTime = DateTime.Now;
             result = new List<signalDtos>();
+            double rate = ((double)400) / ((double)dataToBeConverted.Count());
             double calculated;
             dataToBeConverted.ForEach(metric =>
             {
-                if (metric != null)
+                if (metric != null && metric.data.Length == 54)
                 {
                     for (int i = 3; i < metric.data.Length; i = i + 3)
                     {
@@ -34,14 +39,17 @@ namespace EEG.Connector.Infrastructure.Convertors
                             switch (countRepeat)
                             {
                                 case 1:
-                                    result[channelId - 1].data.Add(metric.timestamp.Ticks.ToString(), calculated);
+                                    _startTime = _startTime.AddMilliseconds(rate);
+                                    result[channelId - 1].data.Add(_startTime.Ticks.ToString(), calculated);
+                                    
                                     break;
                                 case 0:
                                     result.Add(new signalDtos()
                                     {
                                         data = new Dictionary<string, double>()
                                     });
-                                    result.Last().data.Add(metric.timestamp.Ticks.ToString(), calculated);
+                                    _startTime = _startTime.AddMilliseconds(rate);
+                                    result.Last().data.Add(_startTime.AddMilliseconds(rate).Ticks.ToString(), calculated);
                                     break;
                             }
                             

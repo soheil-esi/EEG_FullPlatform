@@ -1,0 +1,10 @@
+{
+    "kafkaEndPoints":{
+        "host" : "kafkaserver",
+        "port" : "29092",
+        "schemaRegistryHost" : "schemaregistry",
+        "schemaRegistryPort" : "8081",
+        "Producer":"ProductionAICoreToArchive",
+        "Consumer" : "ProductionConnectorToAICore"
+        }
+}

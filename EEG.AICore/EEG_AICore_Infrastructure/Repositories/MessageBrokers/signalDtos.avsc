@@ -1,0 +1,16 @@
+{
+  "namespace": "EEG.Connector.Domain.Dtos",
+  "type": "record",
+  "name": "signalDtos",
+  "fields": [
+    {
+        "name": "data",
+        "type": { 
+            "type": "map",
+            "name": "signaldto",
+            "values": "double"
+        }
+        
+    }
+  ]
+}

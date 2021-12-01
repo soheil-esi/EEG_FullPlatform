@@ -53,8 +53,8 @@ namespace EEG.Connector.Infrastructure.Repositories.MessageBorkers
                     new TopicSpecification
                     {
                         Name = topicName,
-                        ReplicationFactor = 1,
-                        NumPartitions = 3
+                        ReplicationFactor = (short)replicationFactor,
+                        NumPartitions = numPartitions
                     }
                 });
             }
@@ -70,12 +70,20 @@ namespace EEG.Connector.Infrastructure.Repositories.MessageBorkers
             var partition = new TopicPartition(
                 topicName,
                 new Partition(_partition));
-            await _producer.ProduceAsync(partition,
-                new Message<int, signalDtos>
-                {
-                    Key =key ,
-                    Value = toBeProduced
-                });
+            try
+            {
+                await _producer.ProduceAsync(partition, 
+                    new Message<int, signalDtos>
+                    {
+                        Key = key,
+                        Value = toBeProduced
+                    });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
             return true;
         }
     }

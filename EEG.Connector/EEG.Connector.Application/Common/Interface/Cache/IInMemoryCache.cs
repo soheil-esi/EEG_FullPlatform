@@ -10,6 +10,7 @@ namespace EEG.Connector.Application.Common.Interface.Cache
     public interface IInMemoryCache<T>
     {
         public void Set(T toBeWritten);
-        public List<T> Get();
+        public int Count();
+        public List<T> Get(int count);
     }
 }

@@ -26,7 +26,7 @@ namespace EEG.Archive.Infrastructure.Repositories
         public void Insert(List<PointData> channelDtos)
         {
             writeApi.WritePoints(influxConfig.org, influxConfig.org, channelDtos);
-            Console.WriteLine($"{channelDtos.Count} has been inserted into InfluxDB!");
+            Console.WriteLine($"{channelDtos.Count} has been inserted into InfluxDB with the IP of {influxConfig.host}!");
         }
     }
 }

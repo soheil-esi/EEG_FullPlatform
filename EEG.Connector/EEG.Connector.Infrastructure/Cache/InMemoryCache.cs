@@ -17,11 +17,24 @@ namespace EEG.Connector.Infrastructure
             localCache = new List<T>();
         }
 
-        public List<T> Get()
+        public int Count()
+        {
+            return localCache.Count;
+        }
+
+        public List<T> Get(int count)
         {
             List<T> result = new List<T>();
-            result = localCache.GetRange(0, localCache.Count());
-            localCache.RemoveRange(0, localCache.Count());
+            if(count > localCache.Count())
+            {
+                result = localCache.GetRange(0, localCache.Count());
+                localCache.RemoveRange(0, localCache.Count());
+            }
+            else
+            {
+                result = localCache.GetRange(0, count);
+                localCache.RemoveRange(0, count);
+            }
             return result;
         }
 

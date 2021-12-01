@@ -1,4 +1,5 @@
-﻿using EEG.Connector.Application.Common.Interface.Cache;
+﻿using EEG.Connector.Application.Common.Interface;
+using EEG.Connector.Application.Common.Interface.Cache;
 using EEG.Connector.Application.Common.Interface.Configuration;
 using EEG.Connector.Application.Common.Interface.Convertors;
 using EEG.Connector.Application.Common.Interface.Repositories;

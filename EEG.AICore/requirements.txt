@@ -1,0 +1,11 @@
+Django
+pandas
+numpy
+confluent-kafka
+PyWavelets
+requests 
+avro
+scipy
+seaborn
+sklearn
+keras

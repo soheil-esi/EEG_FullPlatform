@@ -7,16 +7,12 @@ networks:
 services:
   zookeeper-server:
     image: bitnami/zookeeper:latest
-    networks:
-      - kafka-net
     ports:
       - 2181:2181
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
   kafdrop:
     image: obsidiandynamics/kafdrop
-    networks:
-      - kafka-net
     restart: "no"
     ports:
       - 9000:9000
@@ -28,8 +24,6 @@ services:
       - kafkaserver
   kafkaserver:
     image: bitnami/kafka:latest
-    networks:
-      - kafka-net
     ports:
       - 9092:9092
     environment:
@@ -43,8 +37,6 @@ services:
       - zookeeper-server
   schemaregistry:
     image: confluentinc/cp-schema-registry:latest
-    networks:
-      - kafka-net
     ports:
       - 8081:8081
     environment:
@@ -54,12 +46,10 @@ services:
     depends_on:
       - kafkaserver
   influxdb1:
-    networks:
-        - kafka-net
     image: influxdb:2.0.7
     volumes:
       # Mount for influxdb data directory and configuration
-      - /Users/anaisdotis-georgiou/temp/influxdbv2:/var/lib/influxdb21:rw
+      - ./anaisdotis-georgiou/temp/influxdbv2:/var/lib/influxdb21:rw
       - ./ssl/influxdb-selfsigned.crt:/etc/ssl/influxdb-selfsigned.crt:rw
       - ./ssl/influxdb-selfsigned.key:/etc/ssl/influxdb-selfsigned.key:rw
     environment: 
@@ -70,12 +60,10 @@ services:
       - "8087:8086"
     restart: on-failure:10
   influxdb2:
-    networks:
-        - kafka-net
     image: influxdb:2.0.7
     volumes:
       # Mount for influxdb data directory and configuration
-      - /Users/anaisdotis-georgiou/temp/influxdbv2:/var/lib/influxdb22:rw
+      - ./anaisdotis-georgiou/temp/influxdbv2:/var/lib/influxdb22:rw
       - ./ssl/influxdb-selfsigned.crt:/etc/ssl/influxdb-selfsigned.crt:rw
       - ./ssl/influxdb-selfsigned.key:/etc/ssl/influxdb-selfsigned.key:rw
     environment: 
@@ -86,8 +74,6 @@ services:
       - "8088:8086"
     restart: on-failure:10
   grafana:
-    networks:
-        - kafka-net
     image: grafana/grafana:latest
     ports:
       - '3050:3000'
@@ -101,8 +87,6 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
   archive:
-    networks:
-      - kafka-net
     build:
         context: ./EEG.Archive
         dockerfile: Dockerfile
@@ -114,8 +98,6 @@ services:
       - kafkaserver
       - schemaregistry
   connector:
-    networks:
-      - kafka-net
     build:
         context: ./EEG.Connector
         dockerfile: Dockerfile
@@ -127,8 +109,6 @@ services:
       - kafkaserver
       - schemaregistry
   proxysocket:
-      networks:
-        - kafka-net
       build:
           context: ./EEG.ProxySocket
           dockerfile: Dockerfile
@@ -139,6 +119,13 @@ services:
       depends_on:
         - kafkaserver
         - schemaregistry
+  aicore:
+    build: ./EEG.AICore
+    command: python manage.py runserver 0.0.0.0:8000 
+    volumes:
+      - .:/aicore
+    ports:
+      - "8000:8000"
 volumes:
   influxdb-storage:
   grafana-storage:
